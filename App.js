@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 export default function App() {
   const [tasks, setTasks] = useState([]); // estado para armazenar a lista de tarefas
   const [newTask, setNewTask] = useState(""); // estado para o texto da nova tarefa
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -78,37 +79,44 @@ export default function App() {
   };
 
   const renderList = ({ item }) => (
-    <View style={styles.taskItem} key={item.id}>
+    <View style={[styles.taskItem, darkMode && dark.TastItem]} key={item.id}>
       <TouchableOpacity
         onPress={() => toggleTaskComplete(item.id)}
         style={styles.taskTextContainer}
       >
         <Text
-          style={[styles.taskText, item.completed && styles.completedTaskItem]}
+          style={[
+            styles.taskText,
+            darkMode && dark.taskText,
+            item.completed && styles.completedTaskItem,
+          ]}
         >
           {item.text}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => deleteTask(item.id)}>
-        <Text style={styles.taskText}>🗑️</Text>
+        <Text style={[styles.taskText, darkMode && dark.taskText]}>🗑️</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>Minhas Tarefas</Text>
-        <TouchableOpacity>
-          <Text>🌙</Text>
+    <View style={[styles.container, darkMode && dark.container]}>
+      <View style={[styles.topBar, darkMode && dark.topBar]}>
+        <Text style={[styles.topBarTitle, darkMode && dark.topBarTitle]}>
+          Minhas Tarefas
+        </Text>
+        <TouchableOpacity onPress={() => setDarkMode(!darkMode)}>
+          <Text>{darkMode ? "☀️" : "🌙"}</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, darkMode && dark.card]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, darkMode && dark.input]}
           placeholder="Adicionar nova tarefa..."
+          placeholderTextColor={darkMode ? "#aaa" : "#555"}
           value={newTask}
           onChangeText={setNewTask}
           onSubmitEditing={addTask} // Adiciona a teraf ao pressionar enter no teclado
@@ -119,7 +127,7 @@ export default function App() {
       </View>
 
       <FlatList
-        style={styles.FlatList}
+        style={[styles.FlatList]}
         data={tasks}
         keyExtractor={(item) => item.id}
         renderItem={renderList}
@@ -132,13 +140,13 @@ export default function App() {
         //   </View>
         // )}
         ListEmptyComponent={() => (
-          <Text style={styles.emptyListText}>
+          <Text style={[styles.emptyListText, darkMode && dark.emptyListText]}>
             Nenhuma tarefa adicionada ainda.
           </Text>
         )}
         contentContainerStyle={styles.flatListContent}
       />
-      <StatusBar style="auto" />
+      <StatusBar style={darkMode ? "light" : "dark"} />
     </View>
   );
 }
@@ -245,5 +253,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 50,
     fontSize: 16,
+  },
+});
+
+const dark = StyleSheet.create({
+  container: {
+    backgroundColor: "#121212",
+  },
+  topBar: {
+    backgroundColor: "#1f1f1f",
+    borderBottomColor: "#333",
+  },
+  topBarTitle: {
+    color: "#ffffff",
+  },
+  card: {
+    backgroundColor: "#1e1e1e",  // <-- fundo do card escuro
+  },
+  input: {
+    backgroundColor: "#2c2c2c",  // <-- fundo do input escuro
+    color: "#fff",               // <-- texto claro
+    borderColor: "#555",
+  },
+  taskItem: {
+    backgroundColor: "#1e1e1e",  // <-- fundo da tarefa escuro
+  },
+  taskText: {
+    color: "#ffffff",            // <-- texto claro
+  },
+  emptyListText: {
+    color: "#bbb",
   },
 });
